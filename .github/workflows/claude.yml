@@ -19,9 +19,9 @@ jobs:
       (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
-      issues: read
+      issues: write
       id-token: write
     steps:
       - name: Checkout repository
@@ -33,8 +33,8 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # Or use OAuth token instead:
-          # claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          allowed_tools: "mcp__github__update_pull_request,mcp__github__update_issue,mcp__github__update_pull_request_comment,mcp__github__add_pull_request_review_comment"
           timeout_minutes: "60"
           # mode: tag  # Default: responds to @claude mentions
           # Optional: Restrict network access to specific domains only
