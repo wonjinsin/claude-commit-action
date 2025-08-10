@@ -13,10 +13,7 @@ on:
 jobs:
   claude-code-action:
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude_pr')) ||
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -34,8 +31,11 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ github.token }}
-          allowed_tools: "Bash,Bash(gh:*),mcp__github__update_pull_request,mcp__github__update_issue,mcp__github__update_pull_request_comment,mcp__github__add_pull_request_review_comment"
+          allowed_tools: "Bash(gh:*)"
           timeout_minutes: "60"
+          prompt: |
+            트리거가 PR이면 변경사항을 분석해 .github/PULL_REQUEST_TEMPLATE.md의 형식으로 작성한 후에,
+            그 내용을 gh issue edit을 이용해서 본문을 업데이트 해줘
           # mode: tag  # Default: responds to @claude mentions
           # Optional: Restrict network access to specific domains only
           # experimental_allowed_domains: |
