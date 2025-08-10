@@ -34,7 +34,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ github.token }}
-          allowed_tools: "mcp__github__update_pull_request,mcp__github__update_issue,mcp__github__update_pull_request_comment,mcp__github__add_pull_request_review_comment"
+          allowed_tools: "Bash,Bash(gh:*),mcp__github__update_pull_request,mcp__github__update_issue,mcp__github__update_pull_request_comment,mcp__github__add_pull_request_review_comment"
           timeout_minutes: "60"
           # mode: tag  # Default: responds to @claude mentions
           # Optional: Restrict network access to specific domains only
