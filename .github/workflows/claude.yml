@@ -33,7 +33,7 @@ jobs:
           github_token: ${{ github.token }}
           allowed_tools: "Bash(gh:*),Read,View"
           timeout_minutes: "60"
-          prompt: |
+          direct_prompt: |
             트리거가 PR이면 변경사항을 분석해 .github/PULL_REQUEST_TEMPLATE.md의 형식으로 작성한 후에,
             그 내용을 gh pr edit을 이용해서 본문을 업데이트 해줘
           # mode: tag  # Default: responds to @claude mentions
