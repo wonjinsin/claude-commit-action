@@ -1,0 +1,472 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>server: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">cleanarch/cmd/server/main.go (0.0%)</option>
+				
+				<option value="file1">cleanarch/internal/adapter/http/user_handler.go (9.8%)</option>
+				
+				<option value="file2">cleanarch/internal/app/middleware.go (100.0%)</option>
+				
+				<option value="file3">cleanarch/internal/app/router.go (100.0%)</option>
+				
+				<option value="file4">cleanarch/internal/repository/memory/user_repository.go (100.0%)</option>
+				
+				<option value="file5">cleanarch/internal/usecase/user_service.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "context"
+        "log"
+        "net/http"
+        "os/signal"
+        "syscall"
+        "time"
+
+        httpadapter "cleanarch/internal/adapter/http"
+        "cleanarch/internal/app"
+        "cleanarch/internal/repository/memory"
+        "cleanarch/internal/usecase"
+)
+
+func main() <span class="cov0" title="0">{
+        // Initialize dependencies
+        repo := memory.NewInMemoryUserRepository()
+        service := usecase.NewUserService(repo)
+        handler := httpadapter.NewUserHandler(service)
+
+        mux := app.NewRouter(handler)
+
+        srv := &amp;http.Server{
+                Addr:         ":8080",
+                Handler:      app.WithLogging(mux),
+                ReadTimeout:  10 * time.Second,
+                WriteTimeout: 10 * time.Second,
+                IdleTimeout:  60 * time.Second,
+        }
+
+        // Start server
+        go func() </span><span class="cov0" title="0">{
+                log.Printf("HTTP server listening on %s", srv.Addr)
+                if err := srv.ListenAndServe(); err != nil &amp;&amp; err != http.ErrServerClosed </span><span class="cov0" title="0">{
+                        log.Fatalf("server error: %v", err)
+                }</span>
+        }()
+
+        // Graceful shutdown
+        <span class="cov0" title="0">shutdownCtx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+        defer stop()
+        &lt;-shutdownCtx.Done()
+
+        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer cancel()
+        if err := srv.Shutdown(ctx); err != nil </span><span class="cov0" title="0">{
+                log.Printf("graceful shutdown failed: %v", err)
+        }</span> else<span class="cov0" title="0"> {
+                log.Println("server shutdown complete")
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package http
+
+import (
+        "encoding/json"
+        "log"
+        "net/http"
+        "strconv"
+
+        "cleanarch/internal/usecase"
+)
+
+// UserHandler exposes HTTP endpoints for user operations.
+type UserHandler struct {
+        service *usecase.UserService
+}
+
+func NewUserHandler(service *usecase.UserService) *UserHandler <span class="cov0" title="0">{
+        return &amp;UserHandler{service: service}
+}</span>
+
+func writeJSON(w http.ResponseWriter, status int, v any) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(status)
+        _ = json.NewEncoder(w).Encode(v)
+}</span>
+
+func parseID(r *http.Request) (int64, error) <span class="cov8" title="1">{
+        idStr := r.PathValue("id")
+        return strconv.ParseInt(idStr, 10, 64)
+}</span>
+
+func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        var req struct {
+                Name  string `json:"name"`
+                Email string `json:"email"`
+        }
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+                return
+        }</span>
+        <span class="cov0" title="0">user, err := h.service.CreateUser(req.Name, req.Email)
+        if err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov0" title="0">writeJSON(w, http.StatusCreated, user)</span>
+}
+
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        id, err := parseID(r)
+        if err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+                return
+        }</span>
+        <span class="cov0" title="0">user, err := h.service.GetUser(id)
+        if err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusNotFound, map[string]string{"error": "user not found"})
+                return
+        }</span>
+        <span class="cov0" title="0">writeJSON(w, http.StatusOK, user)</span>
+}
+
+func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        users, err := h.service.ListUsers()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("list users error: %v", err)
+                writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal error"})
+                return
+        }</span>
+        <span class="cov0" title="0">writeJSON(w, http.StatusOK, users)</span>
+}
+
+func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        id, err := parseID(r)
+        if err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+                return
+        }</span>
+        <span class="cov0" title="0">var req struct {
+                Name  string `json:"name"`
+                Email string `json:"email"`
+        }
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+                return
+        }</span>
+        <span class="cov0" title="0">user, err := h.service.UpdateUser(id, req.Name, req.Email)
+        if err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+                return
+        }</span>
+        <span class="cov0" title="0">writeJSON(w, http.StatusOK, user)</span>
+}
+
+func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        id, err := parseID(r)
+        if err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+                return
+        }</span>
+        <span class="cov0" title="0">if err := h.service.DeleteUser(id); err != nil </span><span class="cov0" title="0">{
+                writeJSON(w, http.StatusNotFound, map[string]string{"error": "user not found"})
+                return
+        }</span>
+        <span class="cov0" title="0">w.WriteHeader(http.StatusNoContent)</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package app
+
+import (
+        "log"
+        "net/http"
+        "time"
+)
+
+type statusRecorder struct {
+        http.ResponseWriter
+        status int
+}
+
+func (r *statusRecorder) WriteHeader(code int) <span class="cov8" title="1">{
+        r.status = code
+        r.ResponseWriter.WriteHeader(code)
+}</span>
+
+// WithLogging wraps an http.Handler to log requests and response status/duration.
+func WithLogging(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                recorder := &amp;statusRecorder{ResponseWriter: w, status: http.StatusOK}
+                start := time.Now()
+                next.ServeHTTP(recorder, r)
+                dur := time.Since(start)
+                log.Printf("%s %s -&gt; %d (%s)", r.Method, r.URL.Path, recorder.status, dur)
+        }</span>)
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package app
+
+import (
+        httpadapter "cleanarch/internal/adapter/http"
+        "net/http"
+)
+
+func NewRouter(userHandler *httpadapter.UserHandler) *http.ServeMux <span class="cov8" title="1">{
+        mux := http.NewServeMux()
+
+        mux.HandleFunc("POST /api/v1/users", userHandler.CreateUser)
+        mux.HandleFunc("GET /api/v1/users", userHandler.ListUsers)
+        mux.HandleFunc("GET /api/v1/users/{id}", userHandler.GetUser)
+        mux.HandleFunc("PUT /api/v1/users/{id}", userHandler.UpdateUser)
+        mux.HandleFunc("DELETE /api/v1/users/{id}", userHandler.DeleteUser)
+
+        // Healthcheck
+        mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                w.WriteHeader(http.StatusOK)
+                _, _ = w.Write([]byte("ok"))
+        }</span>)
+
+        <span class="cov8" title="1">return mux</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package memory
+
+import (
+        "errors"
+        "sync"
+        "sync/atomic"
+        "time"
+
+        "cleanarch/internal/domain"
+)
+
+// InMemoryUserRepository is a threadsafe in-memory implementation of UserRepository.
+type InMemoryUserRepository struct {
+        mu        sync.RWMutex
+        autoIncID int64
+        users     map[int64]*domain.User
+}
+
+func NewInMemoryUserRepository() *InMemoryUserRepository <span class="cov8" title="1">{
+        return &amp;InMemoryUserRepository{
+                users: make(map[int64]*domain.User),
+        }
+}</span>
+
+func (r *InMemoryUserRepository) Create(user *domain.User) (*domain.User, error) <span class="cov8" title="1">{
+        if user == nil </span><span class="cov8" title="1">{
+                return nil, errors.New("nil user")
+        }</span>
+        <span class="cov8" title="1">id := atomic.AddInt64(&amp;r.autoIncID, 1)
+        now := time.Now().UTC()
+
+        r.mu.Lock()
+        defer r.mu.Unlock()
+
+        copy := *user
+        copy.ID = id
+        copy.CreatedAt = now
+        copy.UpdatedAt = now
+        r.users[id] = &amp;copy
+        return &amp;copy, nil</span>
+}
+
+func (r *InMemoryUserRepository) GetByID(id int64) (*domain.User, error) <span class="cov8" title="1">{
+        r.mu.RLock()
+        defer r.mu.RUnlock()
+        u, ok := r.users[id]
+        if !ok </span><span class="cov8" title="1">{
+                return nil, errors.New("user not found")
+        }</span>
+        <span class="cov8" title="1">copy := *u
+        return &amp;copy, nil</span>
+}
+
+func (r *InMemoryUserRepository) List() ([]*domain.User, error) <span class="cov8" title="1">{
+        r.mu.RLock()
+        defer r.mu.RUnlock()
+        result := make([]*domain.User, 0, len(r.users))
+        for _, u := range r.users </span><span class="cov8" title="1">{
+                copy := *u
+                result = append(result, &amp;copy)
+        }</span>
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+func (r *InMemoryUserRepository) Update(user *domain.User) (*domain.User, error) <span class="cov8" title="1">{
+        if user == nil </span><span class="cov8" title="1">{
+                return nil, errors.New("nil user")
+        }</span>
+        <span class="cov8" title="1">r.mu.Lock()
+        defer r.mu.Unlock()
+
+        existing, ok := r.users[user.ID]
+        if !ok </span><span class="cov8" title="1">{
+                return nil, errors.New("user not found")
+        }</span>
+        <span class="cov8" title="1">existing.Name = user.Name
+        existing.Email = user.Email
+        existing.UpdatedAt = time.Now().UTC()
+        copy := *existing
+        return &amp;copy, nil</span>
+}
+
+func (r *InMemoryUserRepository) Delete(id int64) error <span class="cov8" title="1">{
+        r.mu.Lock()
+        defer r.mu.Unlock()
+        if _, ok := r.users[id]; !ok </span><span class="cov8" title="1">{
+                return errors.New("user not found")
+        }</span>
+        <span class="cov8" title="1">delete(r.users, id)
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package usecase
+
+import (
+        "errors"
+        "strings"
+
+        "cleanarch/internal/domain"
+)
+
+// UserService implements application-specific use cases around the User aggregate.
+type UserService struct {
+        repo domain.UserRepository
+}
+
+func NewUserService(repo domain.UserRepository) *UserService <span class="cov8" title="1">{
+        return &amp;UserService{repo: repo}
+}</span>
+
+func (s *UserService) CreateUser(name, email string) (*domain.User, error) <span class="cov8" title="1">{
+        name = strings.TrimSpace(name)
+        email = strings.TrimSpace(email)
+        if name == "" || email == "" </span><span class="cov8" title="1">{
+                return nil, errors.New("name and email are required")
+        }</span>
+        <span class="cov8" title="1">return s.repo.Create(&amp;domain.User{Name: name, Email: email})</span>
+}
+
+func (s *UserService) GetUser(id int64) (*domain.User, error) <span class="cov8" title="1">{
+        return s.repo.GetByID(id)
+}</span>
+
+func (s *UserService) ListUsers() ([]*domain.User, error) <span class="cov8" title="1">{
+        return s.repo.List()
+}</span>
+
+func (s *UserService) UpdateUser(id int64, name, email string) (*domain.User, error) <span class="cov8" title="1">{
+        name = strings.TrimSpace(name)
+        email = strings.TrimSpace(email)
+        if name == "" || email == "" </span><span class="cov8" title="1">{
+                return nil, errors.New("name and email are required")
+        }</span>
+        <span class="cov8" title="1">return s.repo.Update(&amp;domain.User{ID: id, Name: name, Email: email})</span>
+}
+
+func (s *UserService) DeleteUser(id int64) error <span class="cov8" title="1">{
+        return s.repo.Delete(id)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
