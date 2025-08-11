@@ -24,7 +24,6 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ github.token }}
           allowed_tools: "Bash(gh:*)"
           timeout_minutes: "60"
           direct_prompt: |
