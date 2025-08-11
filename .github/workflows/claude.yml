@@ -21,12 +21,28 @@ jobs:
           fetch-depth: 1
 
       - name: Run Claude PR Action
+        id: claude
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash(gh:*)"
+          allowed_tools: "Read,View"
           timeout_minutes: "60"
           direct_prompt: |
-            Analyze the changes, format them according to .github/PULL_REQUEST_TEMPLATE.md, 
-            and then update the PR description using gh pr edit.
+            Analyze the changes in this PR and format them according to .github/PULL_REQUEST_TEMPLATE.md.
+            
+            Provide ONLY the formatted PR description content that should be used to update the PR.
+            Do not include any commands or actions - just the description content.
+
+      - name: Update PR with Claude's analysis
+        if: ${{ github.event.issue.pull_request }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          
+          # Claude의 분석 결과를 파일로 저장
+          echo '${{ steps.claude.outputs.response }}' > pr_description.md
+          
+          # gh로 PR 설명 업데이트
+          gh pr edit $PR_NUMBER --body-file pr_description.md
 
