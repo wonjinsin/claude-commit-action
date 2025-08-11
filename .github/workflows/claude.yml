@@ -3,33 +3,10 @@ name: Claude PR Assistant
 on:
   pull_request:
     types: [opened]
-  repository_dispatch:
-    types: [claude-analyze]
-  issue_comment:
-    types: [created]
 
 jobs:
-  auto-trigger:
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Trigger Claude analysis
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ github.token }}
-          event-type: claude-analyze
-          client-payload: |
-            {
-              "pr_number": "${{ github.event.pull_request.number }}",
-              "repository": "${{ github.repository }}"
-            }
-
   claude-code-action:
-    if: |
-      (github.event_name == 'repository_dispatch' && github.event.action == 'claude-analyze') ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude_pr_write'))
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     permissions:
       contents: write
