@@ -15,15 +15,14 @@ jobs:
     steps:
       - name: Add Claude comment to new PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           gh pr comment ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
             --body "@claude_pr_write"
 
   claude-code-action:
-    if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude_pr_write'))
+    if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude_pr_write')
     runs-on: ubuntu-latest
     permissions:
       contents: write
