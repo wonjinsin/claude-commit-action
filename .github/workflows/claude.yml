@@ -3,11 +3,27 @@ name: Claude PR Assistant
 on:
   issue_comment:
     types: [created]
+  pull_request:
+    types: [opened]
 
 jobs:
+  auto-comment:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Add Claude comment to new PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --body "@claude_pr_write"
+
   claude-code-action:
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude_pr'))
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude_pr_write'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
