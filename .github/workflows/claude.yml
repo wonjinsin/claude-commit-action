@@ -24,6 +24,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           allowed_tools: "Bash(gh:*),Read,View"
+          model: "claude-3-5-haiku-latest"
           timeout_minutes: "60"
           direct_prompt: |
             Analyze the changes, format them according to .github/PULL_REQUEST_TEMPLATE.md, 
