@@ -1,0 +1,12 @@
+name: Example Usage of Claude PR Assistant
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  call-claude-default:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    uses: ./.github/workflows/claude.yml
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.DUMMY_ANTHROPIC_API_KEY }}

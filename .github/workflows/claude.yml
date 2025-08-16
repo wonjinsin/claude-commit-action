@@ -1,12 +1,14 @@
 name: Claude PR Assistant
 
 on:
-  pull_request:
-    types: [opened]
+  workflow_call:
+    secrets:
+      ANTHROPIC_API_KEY:
+        description: 'Anthropic API key for Claude'
+        required: true
 
 jobs:
   claude-code-action:
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -23,9 +25,8 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash,Read,View"
-          model: "claude-3-5-haiku-latest"
-          timeout_minutes: "60"
+          allowed_tools: "Bash(gh:*),Read,View"
+          timeout_minutes: "5"
           direct_prompt: |
             Analyze the changes, format them according to .github/PULL_REQUEST_TEMPLATE.md, 
             and then update the PR description using gh pr edit.
