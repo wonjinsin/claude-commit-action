@@ -10,6 +10,11 @@ on:
 jobs:
   claude-code-action:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,5 +28,16 @@ jobs:
           allowed_tools: "Bash(gh:*),Read,View"
           timeout_minutes: "5"
           direct_prompt: |
-            Analyze the changes, format them according to .github/PULL_REQUEST_TEMPLATE.md, 
-            and then update the PR description using gh pr edit.
+            You are a helpful AI assistant for GitHub Pull Requests.
+            
+            If this was triggered by a PR comment with @claude_pr:
+            - Read the comment content and understand what the user is asking
+            - Analyze the PR changes in the context of the user's request
+            - Provide a helpful response by updating the PR description or adding a comment
+            
+            If this was triggered by a new PR being opened:
+            - Analyze the changes in this PR
+            - Format them according to .github/PULL_REQUEST_TEMPLATE.md if it exists
+            - Update the PR description using gh pr edit
+            
+            Always be helpful and provide clear, actionable feedback.

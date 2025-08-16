@@ -3,11 +3,16 @@ name: Example Usage of Claude PR Assistant
 on:
   pull_request:
     types: [opened]
-  
+  issue_comment:
+    types: [created]
 
 jobs:
   call-claude-default:
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    if: |
+      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
+      (github.event_name == 'issue_comment' && 
+       github.event.issue.pull_request && 
+       contains(github.event.comment.body, '@claude_pr'))
     permissions:
       contents: read
       pull-requests: write
