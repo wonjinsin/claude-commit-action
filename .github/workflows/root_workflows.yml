@@ -12,6 +12,7 @@ jobs:
       contents: read
       pull-requests: write
       issues: read
+      id-token: write
     uses: ./.github/workflows/claude.yml
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.DUMMY_ANTHROPIC_API_KEY }}
