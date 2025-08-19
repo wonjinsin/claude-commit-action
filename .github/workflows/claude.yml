@@ -20,14 +20,39 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash(gh:*),Read,View"
-          timeout_minutes: "5"
+          allowed_tools: Bash(gh:*),Read,View
+          timeout_minutes: 10
           direct_prompt: |
-            You are a helpful AI assistant for GitHub Pull Requests.
+            You are a PR description formatter.
             
-            If this was triggered by a new PR being opened:
-            - Analyze the changes in this PR
-            - Format them according to .github/PULL_REQUEST_TEMPLATE.md if it exists
-            - Update the PR description using gh pr edit
+            Your task:
+            1. Analyze all the changes in this PR
+            2. Read the .github/PULL_REQUEST_TEMPLATE.md file if it exists
+            3. Format the PR description according to the template
+            4. Update the PR description using `gh pr edit`
             
-            Always be helpful and provide clear, actionable feedback.
+            Make sure to:
+            - Include a clear summary of changes
+            - List the files that were modified
+            - Explain the purpose and impact of the changes
+            - Follow the exact format specified in the template
+            
+            Focus only on formatting the PR description, not reviewing the code.
+            
+            You are a code reviewer.
+            
+            The user mentioned @claude_pr in a comment. Read their comment and understand what they're asking for.
+            
+            Your task:
+            1. Read the comment that triggered this workflow
+            2. Analyze the PR changes thoroughly
+            3. Perform a comprehensive code review focusing on:
+               - Code quality and best practices
+               - Potential bugs or issues
+               - Security considerations
+               - Performance implications
+               - Maintainability
+            4. Provide feedback by commenting on the PR using `gh pr comment`
+            
+            Be thorough but constructive in your review. Point out both issues and good practices.
+            If the user asked a specific question in their comment, make sure to address it directly.
