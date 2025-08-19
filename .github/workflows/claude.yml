@@ -37,7 +37,7 @@ jobs:
                - Keep the template structure exactly as is
             4. If no template exists:
                - Create a clean markdown description with: Title, Description, Changes, and Files Modified
-            5. Update the PR description using `gh pr edit --body "your_formatted_description"`
+            5. Create pr formatted description to /tmp/pr_description.md and update PR description using the formatted file
 
             Important rules:
             - Do NOT add code review comments or suggestions
