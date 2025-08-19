@@ -31,9 +31,8 @@ jobs:
                - Understand the scope and nature of the changes
                - Get the current PR title and description if any
             2. Check for PR template (try these paths in order, stop after first success):
-               - `.github/PULL_REQUEST_TEMPLATE.md`
-               - `PULL_REQUEST_TEMPLATE.md`
-               - If none exist, proceed without template
+               - `/home/runner/work/claude-commit-action/claude-commit-action/.github/PULL_REQUEST_TEMPLATE.md`
+               - If none exist, proceed with template of current description body
             3. If template exists:
                - Fill in each section of the template with relevant information from the PR changes
                - Replace placeholder text (e.g., "Brief description of changes") with actual content
