@@ -30,7 +30,10 @@ jobs:
                - Check what files were changed (use git diff, gh pr view, or other methods)
                - Understand the scope and nature of the changes
                - Get the current PR title and description if any
-            2. Check if `.github/PULL_REQUEST_TEMPLATE.md` exists by reading the file
+            2. Check for PR template (try these paths in order, stop after first success):
+               - `.github/PULL_REQUEST_TEMPLATE.md`
+               - `PULL_REQUEST_TEMPLATE.md`
+               - If none exist, proceed without template
             3. If template exists:
                - Fill in each section of the template with relevant information from the PR changes
                - Replace placeholder text (e.g., "Brief description of changes") with actual content
