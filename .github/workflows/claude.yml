@@ -27,8 +27,7 @@ jobs:
 
             Instructions:
             1. Gather information about this PR:
-               - Get PR details: `gh pr view --json title,body,files`
-               - See all changed files in this PR: `git diff --name-only origin/main...HEAD` (or use base branch)
+               - See all changed files in this PR: `git diff origin/main` (or use base branch)
                - Understand the scope and nature of all changes across all commits in this PR
             2. Check for PR template (try these paths in order, stop after first success):
                - `/home/runner/work/claude-commit-action/claude-commit-action/.github/PULL_REQUEST_TEMPLATE.md`
