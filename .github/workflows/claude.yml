@@ -20,7 +20,7 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: Bash(gh:*),Read,View
+          allowed_tools: "Bash(gh:pr edit,gh:pr view,gh:pr diff,gh:pr comment,gh:api,gh:repo),Read,View"
           timeout_minutes: 10
           direct_prompt: |
             You are a PR description formatter. Your ONLY task is to format the PR description according to the template.
@@ -42,7 +42,10 @@ jobs:
             5. Create pr formatted description to /tmp/pr_description.md and update PR description using the formatted file
 
             Important rules:
-            - Do NOT Update comments claude comments while you are working on, only update the PR description when you start and when you finished working
+            - Create/update comment ONLY at the very beginning (to indicate you started) and at the very end (to indicate completion)
+            - Do NOT update comments during the middle of your work - work silently between start and end
+            - Use `gh pr comment` only for: "🔄 Starting PR description formatting..." (beginning) and "✅ PR description updated according to template" (end)
+            - FOCUS on updating the PR description using `gh pr edit`
             - Do NOT add code review comments or suggestions
             - Do NOT analyze code quality or performance
             - ONLY focus on filling out the description template accurately
