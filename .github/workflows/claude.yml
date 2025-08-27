@@ -20,7 +20,7 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          allowed_tools: "Bash(gh:pr edit,gh:pr view,gh:pr diff,gh:pr comment,gh:api,gh:repo),Read,View"
+          allowed_tools: Bash(gh:*),Read,View
           timeout_minutes: 10
           direct_prompt: |
             You are a PR description formatter. Your ONLY task is to format the PR description according to the template.
