@@ -42,6 +42,7 @@ jobs:
             5. Create pr formatted description to /tmp/pr_description.md and update PR description using the formatted file
 
             Important rules:
+            - Do NOT Update comments claude comments while you are working on, only update the PR description when you start and when you finished working
             - Do NOT add code review comments or suggestions
             - Do NOT analyze code quality or performance
             - ONLY focus on filling out the description template accurately
