@@ -2,7 +2,7 @@ name: Example Usage of Claude PR Assistant
 
 on:
   pull_request:
-    types: [opened]
+    # types: [opened]
     paths:
       - '.github/**'
 
@@ -26,11 +26,11 @@ jobs:
   #     ANTHROPIC_API_KEY: ${{ secrets.DUMMY_ANTHROPIC_API_KEY }}
 
   call-claude-default:
-    if: |
-      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
-      (github.event_name == 'issue_comment' && 
-       github.event.issue.pull_request && 
-       contains(github.event.comment.body, '@claude_pr'))
+    # if: |
+    #   (github.event_name == 'pull_request' && github.event.action == 'opened') ||
+    #   (github.event_name == 'issue_comment' && 
+    #    github.event.issue.pull_request && 
+    #    contains(github.event.comment.body, '@claude_pr'))
     permissions:
       contents: read
       pull-requests: write
