@@ -3,10 +3,28 @@ name: Example Usage of Claude PR Assistant
 on:
   pull_request:
     types: [opened]
+    paths:
+      - '.github/**'
+
   issue_comment:
     types: [created]
 
 jobs:
+  call-claude-pr-description:
+    if: |
+      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
+      (github.event_name == 'issue_comment' && 
+       github.event.issue.pull_request && 
+       contains(github.event.comment.body, '@claude_pr'))
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    uses: ./.github/workflows/claude_pr_description.yml
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.DUMMY_ANTHROPIC_API_KEY }}
+
   call-claude-default:
     if: |
       (github.event_name == 'pull_request' && github.event.action == 'opened') ||
@@ -18,6 +36,6 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
-    uses: ./.github/workflows/claude.yml
+    uses: ./.github/workflows/claude_pr_review.yml
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.DUMMY_ANTHROPIC_API_KEY }}

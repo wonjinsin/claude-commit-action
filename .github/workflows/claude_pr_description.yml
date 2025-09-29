@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Run Claude PR Action
+      - name: Create PR Description using Claude
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
