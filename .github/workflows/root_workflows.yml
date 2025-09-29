@@ -3,8 +3,6 @@ name: Example Usage of Claude PR Assistant
 on:
   pull_request:
     types: [opened]
-    paths:
-      - '.github/**'
 
   issue_comment:
     types: [created]
