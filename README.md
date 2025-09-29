@@ -1,87 +1,73 @@
-# Go Clean Architecture HTTP Server (User CRUD)
+# Claude Commit Action Test Repository
 
-This project demonstrates a minimal HTTP server in Go following Clean Architecture principles with a `User` CRUD example. It uses only the standard library and Go 1.22's `http.ServeMux` path patterns.
+This repository is created for testing the Claude PR Assistant GitHub Action.
 
-## Requirements
-
-- Go 1.22+
-
-## Run
-
-```bash
-go build ./...
-GO111MODULE=on go run ./cmd/server
-```
-
-The server starts on `:8080`.
-
-## Endpoints
-
-- POST `/api/v1/users`
-- GET `/api/v1/users`
-- GET `/api/v1/users/{id}`
-- PUT `/api/v1/users/{id}`
-- DELETE `/api/v1/users/{id}`
-- GET `/healthz`
-
-## Examples
-
-Create:
-
-```bash
-curl -s -X POST http://localhost:8080/api/v1/users \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Alice","email":"alice@example.com"}' | jq
-```
-
-List:
-
-```bash
-curl -s http://localhost:8080/api/v1/users | jq
-```
-
-Get by ID:
-
-```bash
-curl -s http://localhost:8080/api/v1/users/1 | jq
-```
-
-Update:
-
-```bash
-curl -s -X PUT http://localhost:8080/api/v1/users/1 \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Alice Cooper","email":"acooper@example.com"}' | jq
-```
-
-Delete:
-
-```bash
-curl -i -X DELETE http://localhost:8080/api/v1/users/1
-```
-
-## Structure
+## 📁 .github Directory Structure
 
 ```
-cmd/
-  server/
-    main.go
-internal/
-  app/
-    router.go
-    middleware.go
-  adapter/
-    http/
-      user_handler.go
-  domain/
-    user.go
-  repository/
-    memory/
-      user_repository.go
-  usecase/
-    user_service.go
+.github/
+├── PULL_REQUEST_TEMPLATE.md
+└── workflows/
+    ├── claude.yml
+    └── root_workflows.yml
 ```
 
-## Notes
+## 🔧 GitHub Actions Workflows
 
-- The repository is in-memory for demo purposes. Swap it with a real implementation (e.g., Postgres) by implementing `internal/domain.UserRepository` and wiring it in `cmd/server/main.go`.
+### 1. claude.yml - Claude PR Assistant Workflow
+
+A reusable workflow that automatically formats PR descriptions using Claude AI.
+
+**Key Features:**
+
+- Analyzes PR changes to generate template-compliant descriptions
+- Automatically fills Pull Request templates
+- Uses `anthropics/claude-code-action@beta` action
+
+**Required Secrets:**
+
+- `ANTHROPIC_API_KEY`: Anthropic API key for Claude API access
+
+**Allowed Tools:**
+
+- `Bash(gh:*)`: GitHub CLI commands
+- `Read`: File reading
+- `View`: File viewing
+
+### 2. root_workflows.yml - Usage Example
+
+A workflow that actually calls the Claude PR Assistant.
+
+**Trigger Conditions:**
+
+- When a PR is opened (`pull_request.opened`)
+- When `@claude_pr` is mentioned in issue comments
+
+**Permissions:**
+
+- `contents: read` - Read repository contents
+- `pull-requests: write` - Modify PRs
+- `issues: write` - Write issues
+- `id-token: write` - Write ID tokens
+
+## 🚀 Usage
+
+1. **On PR Creation**: When creating a new PR, Claude automatically analyzes changes and fills the template.
+
+2. **Manual Trigger**: Mention `@claude_pr` in PR comments to re-run Claude.
+
+## ⚙️ Setup Requirements
+
+To use this action, you need:
+
+1. **Anthropic API Key**: Set your Claude API access key to `ANTHROPIC_API_KEY` secret
+2. **Proper Permissions**: Workflow needs permissions to modify PRs and issues
+
+## 🔍 Testing Purpose
+
+This repository is used to test:
+
+- Claude AI's PR analysis and description generation capabilities
+- Proper operation of GitHub Actions workflows
+- Automatic Pull Request template filling functionality
+- Behavior under various trigger conditions
