@@ -37,5 +37,6 @@ jobs:
             - Performance considerations
             - Maintainability and readability
             - Architecture and design decisions
+            - Please leave comments only where you think corrections are necessary, and there’s no need to add compliments about the code
 
             Provide specific, actionable feedback. Use inline comments for line-specific issues and include an overall summary when submitting the review. **Important**: Submit as "COMMENT" type so the review doesn't block the PR.
